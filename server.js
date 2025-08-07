@@ -6,8 +6,9 @@ const cors = require('cors');
 const crypto = require('crypto'); // Імпортуємо модуль для генерації ID
 
 // --- КОНФІГУРАЦІЯ ---
-const SPREADSHEET_ID = '1K9uUgDlomh_Xpnrc_C2pBAaKbCxzUDylm89UGtdhmPQ';
-// Назви аркушів згідно з вашою новою структурою
+// ID вашої Google Таблиці
+const SPREADSHEET_ID = '1K9uUgDlomh_Xpnrc_C2pBAaKbCxzUDylm89UGtdhmPQ'; 
+// Назви аркушів згідно з вашою фінальною структурою
 const SHIFTS_SHEET_TITLE = 'shifts';
 const RADAR_TARGETS_SHEET_TITLE = 'radar_targets';
 const INTERCEPTOR_SORTIES_SHEET_TITLE = 'interceptor_sorties';
@@ -68,7 +69,7 @@ app.post('/submit', async (req, res) => {
     let rowsToAdd = [];
     let sheetToAddRowsTo;
 
-    // ================== НОВА ЛОГІКА ДЛЯ РЕЛЯЦІЙНОЇ МОДЕЛІ ==================
+    // ================== ЛОГІКА, АДАПТОВАНА ПІД ФІНАЛЬНУ СТРУКТУРУ ==================
     if (formType === 'rls') {
         const { targetsData } = req.body;
         if (!targetsData || targetsData.length === 0) {
@@ -101,8 +102,6 @@ app.post('/submit', async (req, res) => {
 
         // Додаємо специфічні для перехоплювача поля до зміни
         newShiftRow.takeoff_point = shiftData.takeoffPoint;
-        // Додаємо номер борту, якщо він є в даних
-        if(shiftData.boardNumber) newShiftRow.board_number = shiftData.boardNumber;
 
         // Готуємо рядки для додавання в `interceptor_sorties`
         sheetToAddRowsTo = sortiesSheet;
