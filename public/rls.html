@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Прототип: Форма звітності РЛС (Render)</title>
+    <title>Прототип: Форма звітності РЛС</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
@@ -23,9 +23,8 @@
     <div class="container mx-auto p-4 md:p-8">
         <header class="mb-8">
             <h1 class="text-3xl font-bold text-white">Система звітності дронів-перехоплювачів</h1>
-            <p class="text-lg text-gray-400 mt-1">Прототип форми для екіпажу РЛС (Версія для Render)</p>
+            <p class="text-lg text-gray-400 mt-1">Прототип форми для екіпажу РЛС</p>
         </header>
-        <!-- Ваша форма залишається без змін -->
         <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 mb-8">
             <h2 class="text-xl font-semibold mb-4 border-b border-gray-600 pb-2 text-white">Дані по зміні</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -49,10 +48,6 @@
                 <div>
                     <label for="rls-position" class="block text-sm font-medium text-gray-400 mb-1">Позиція РЛС</p>
                     <input type="text" id="rls-position" class="w-full bg-gray-700 border border-gray-600 text-white placeholder-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" placeholder="Напр. Квадрат 4815">
-                </div>
-                <div>
-                    <label for="rls-type" class="block text-sm font-medium text-gray-400 mb-1">Тип РЛС</label>
-                    <input type="text" id="rls-type" class="w-full bg-gray-700 border border-gray-600 text-white placeholder-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" placeholder="Напр. Eagle Eye X">
                 </div>
                  <div>
                     <label for="sector" class="block text-sm font-medium text-gray-400 mb-1">Сектор відповідальності</label>
@@ -128,7 +123,6 @@
                 </button>
             </div>
         </div>
-        <!-- Модальні вікна та тости залишаються без змін -->
         <div id="modal" class="modal-backdrop fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden opacity-0">
             <div class="bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-8 max-w-sm w-full mx-4">
                 <h3 id="modal-title" class="text-xl font-bold mb-4 text-white"></h3>
@@ -144,10 +138,7 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // *** ГОЛОВНА ЗМІНА: URL вашого бекенду на Render ***
-            const API_URL = "https://rls-reporting-service.onrender.com/submit"; // <--- ВАША РЕАЛЬНА АДРЕСА
-
-            // Решта JS-коду залишається майже без змін
+            const API_URL = "https://rls-reporting-service.onrender.com/submit";
             const submitReportBtn = document.getElementById('submit-report-btn');
             const turnNumberInput = document.getElementById('target-turn-number');
             let targets = [];
@@ -167,10 +158,18 @@
                     rlsId: document.getElementById('rls-id').value,
                     shiftStartTime: document.getElementById('shift-start-time').value,
                     rlsPosition: document.getElementById('rls-position').value,
-                    rlsType: document.getElementById('rls-type').value,
                     sector: document.getElementById('sector').value,
                 };
-                const report = { shiftData, targetsData: targets };
+                
+                // ======================= FIX =======================
+                // Додаємо відсутнє поле formType, щоб сервер знав,
+                // з якої форми прийшли дані.
+                const report = { 
+                    formType: 'rls', 
+                    shiftData, 
+                    targetsData: targets 
+                };
+                // ===================================================
                 
                 fetch(API_URL, {
                     method: 'POST',
@@ -188,11 +187,9 @@
                         turnNumberInput.value = nextTurnNumber;
                         renderTable();
                         updateStats();
-                        // Очистка полів зміни після успішної відправки
                         document.getElementById('crew-id').selectedIndex = 0;
                         document.getElementById('rls-id').value = '';
                         document.getElementById('rls-position').value = '';
-                        document.getElementById('rls-type').value = '';
                         document.getElementById('sector').value = '';
                     } else {
                         throw new Error(data.message);
@@ -203,13 +200,12 @@
                     showModal('Помилка відправки', `Не вдалося зв'язатися з сервером. Помилка: ${error.message}`);
                 })
                 .finally(() => {
-                    submitReportBtn.disabled = false;
+                    submitButtonText.disabled = false;
                     submitButtonText.textContent = 'Надіслати звіт по зміні';
                     loader.classList.add('hidden');
                 });
             });
 
-            // Решта JS-функцій залишається без змін...
             const detectedCountEl = document.getElementById('detected-count');
             const hitCountEl = document.getElementById('hit-count');
             const targetsTableBody = document.getElementById('targets-table-body');
